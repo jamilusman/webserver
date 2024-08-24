@@ -41,7 +41,7 @@ jobs:
     - name: Set up Minikube
       shell: powershell
       run: |
-        Start-Process powershell -Verb runAs -ArgumentList "minikube start --driver=docker"
+        Start-Process powershell -Verb runAs -ArgumentList "minikube start"
 
     - name: Build image
       shell: powershell
@@ -50,7 +50,6 @@ jobs:
 
     - name: Deploy to Kubernetes
       run: |
-
         helm upgrade webapp-release-qa ./ --values ./values.yaml -f ./values-qa.yaml -n qa
 
         # Use Helm to deploy with the appropriate values file
