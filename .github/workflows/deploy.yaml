@@ -43,9 +43,6 @@ jobs:
       run: |
         Start-Process powershell -Verb runAs -ArgumentList "minikube start --driver=docker"
 
-    - name: Try the cluster !
-      run: kubectl get pods -A
-      
     - name: Build image
       shell: powershell
       run: |
