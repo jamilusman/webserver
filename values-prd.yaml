@@ -1,0 +1,7 @@
+namespace: prd
+
+spec:
+  replicas: 3
+
+container:
+  containerName: nginx-container-prd

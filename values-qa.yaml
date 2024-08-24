@@ -1,0 +1,7 @@
+namespace: qa
+
+spec:
+  replicas: 2
+
+container:
+  containerName: nginx-container-qa
