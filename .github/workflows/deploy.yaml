@@ -33,16 +33,9 @@ jobs:
       run: |
         docker --version
 
-    - name: Install Minikube
+    - name: Check Minikube Version
       shell: powershell
       run: |
-        # Download Minikube binary
-        Invoke-WebRequest -Uri "https://storage.googleapis.com/minikube/releases/latest/minikube-windows-amd64.exe" -OutFile "$env:USERPROFILE\minikube.exe"
-        # Move Minikube to PATH
-        Move-Item -Path "$env:USERPROFILE\minikube.exe" -Destination "$env:ProgramFiles\Minikube\minikube.exe"
-        # Add Minikube to PATH
-        [System.Environment]::SetEnvironmentVariable('PATH', "$env:ProgramFiles\Minikube", [System.EnvironmentVariableTarget]::Machine)
-        # Verify Minikube installation
         minikube version
 
     - name: Set up Minikube
