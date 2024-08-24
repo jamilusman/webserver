@@ -71,6 +71,11 @@ jobs:
     #     kubectl apply -f templates/deployment.yaml
     #     kubectl apply -f templates/service.yaml
 
+    - name: Test service URLs
+      run: |
+        kubectl get pods -A
+        kubectl get svc -A
+        
     - name: Verify deployment
       run: |
         kubectl --namespace qa port-forward service/nginxapp 8888:80
