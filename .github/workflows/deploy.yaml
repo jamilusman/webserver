@@ -38,8 +38,8 @@ jobs:
     #   run: |
     #     docker push ${{ secrets.REGISTRY_URL }}/my-nginx-image:${{ github.sha }}
 
-    - name: Start Minikube
-      uses: medyagh/setup-minikube@latest
+    # - name: Start Minikube
+    #   uses: medyagh/setup-minikube@latest
 
     - name: Try the cluster !
       run: kubectl get pods -A
