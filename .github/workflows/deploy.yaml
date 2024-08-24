@@ -43,6 +43,7 @@ jobs:
     - name: Set up Minikube
       run: |
         minikube start --driver=none
+        kubectl config use-context minikube
 
     - name: Try the cluster !
       run: kubectl get pods -A
