@@ -46,15 +46,10 @@ jobs:
     - name: Start minikube
       uses: medyagh/setup-minikube@latest
 
-    # - name: Set up Minikube
-    #   shell: powershell
-    #   run: |
-    #     Start-Process powershell -Verb runAs -ArgumentList "minikube start"
-
     - name: Build image
       shell: powershell
       run: |
-        Start-Process powershell -Verb runAs -ArgumentList "docker build -f ./Dockerfile -t nginx:latest ."
+        docker build -f ./Dockerfile -t nginx:latest .
 
     - name: Deploy to Kubernetes
       run: |
