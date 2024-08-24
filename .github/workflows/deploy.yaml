@@ -23,20 +23,16 @@ jobs:
       with:
         repository: jamilusman/webserver
 
-    # - name: Set Execution Policy
-    #   shell: powershell
-    #   run: |
-    #     Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
-
     - name: Install Docker
-      shell: powershell
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y docker.io
+        sudo systemctl start docker
+        sudo systemctl enable docker
+
+    - name: Verify Docker Installation
       run: |
         docker --version
-
-    - name: Check Minikube Version
-      shell: powershell
-      run: |
-        minikube version
 
     - name: Start minikube
       uses: medyagh/setup-minikube@latest
