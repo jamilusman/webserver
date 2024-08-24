@@ -34,13 +34,16 @@ jobs:
         $ErrorActionPreference = 'Stop'
         # Download Docker Desktop installer
         Invoke-WebRequest -Uri "https://desktop.docker.com/win/stable/Docker%20Desktop%20Installer.exe" -OutFile "$env:TEMP\DockerDesktopInstaller.exe"
-        # Install Docker Desktop
-        Start-Process -Wait -FilePath "$env:TEMP\DockerDesktopInstaller.exe" -ArgumentList "install --quiet"
+        # Install Docker Desktop and log the output
+        Start-Process -Wait -FilePath "$env:TEMP\DockerDesktopInstaller.exe" -ArgumentList "install", "/quiet", "/norestart" -NoNewWindow -RedirectStandardOutput "$env:TEMP\docker_install.log" -RedirectStandardError "$env:TEMP\docker_install_error.log"
         # Wait for Docker to start
-        Start-Sleep -Seconds 30
+        Start-Sleep -Seconds 60
         # Verify Docker installation
         docker --version
         docker run hello-world
+        # Output log files for debugging
+        Get-Content "$env:TEMP\docker_install.log"
+        Get-Content "$env:TEMP\docker_install_error.log"
 
     - name: Install Minikube
       shell: powershell
