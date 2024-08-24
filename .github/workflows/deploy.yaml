@@ -44,6 +44,10 @@ jobs:
       run: |
         minikube start --driver=docker
         kubectl config use-context minikube
+      env:
+        DOCKER_HOST: tcp://localhost:2376
+        DOCKER_TLS_VERIFY: 1
+        DOCKER_CERT_PATH: /path/to/cert
 
     - name: Try the cluster !
       run: kubectl get pods -A
