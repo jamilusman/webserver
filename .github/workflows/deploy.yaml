@@ -24,7 +24,7 @@ jobs:
         repository: jamilusman/webserver
 
     - name: Install Docker
-      shell: pwsh
+      shell: powershell
       run: |
         $ErrorActionPreference = 'Stop'
         # Download Docker Desktop installer
@@ -38,7 +38,7 @@ jobs:
         docker run hello-world
 
     - name: Install Minikube
-      shell: pwsh
+      shell: powershell
       run: |
         # Download Minikube binary
         Invoke-WebRequest -Uri "https://storage.googleapis.com/minikube/releases/latest/minikube-windows-amd64.exe" -OutFile "$env:USERPROFILE\minikube.exe"
@@ -50,7 +50,7 @@ jobs:
         minikube version
 
     - name: Set up Minikube
-      shell: pwsh
+      shell: powershell
       run: |
         minikube start --driver=docker
         kubectl config use-context minikube
