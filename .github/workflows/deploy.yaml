@@ -75,6 +75,11 @@ jobs:
       run: |
         kubectl get pods -A
         kubectl get svc -A
+
+    - name: Wait for Pods to be Ready
+      run: |
+        kubectl wait --for=condition=available --timeout=300s deployment/nginxapp --namespace qa
+        kubectl wait --for=condition=ready --timeout=300s pod -l app=nginxapp --namespace qa
         
     - name: Verify deployment
       run: |
