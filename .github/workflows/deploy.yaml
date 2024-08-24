@@ -38,10 +38,13 @@ jobs:
       run: |
         minikube version
 
-    - name: Set up Minikube
-      shell: powershell
-      run: |
-        Start-Process powershell -Verb runAs -ArgumentList "minikube start"
+    - name: Start minikube
+      uses: medyagh/setup-minikube@latest
+
+    # - name: Set up Minikube
+    #   shell: powershell
+    #   run: |
+    #     Start-Process powershell -Verb runAs -ArgumentList "minikube start"
 
     - name: Build image
       shell: powershell
