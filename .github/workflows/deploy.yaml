@@ -45,9 +45,12 @@ jobs:
 
     - name: Try the cluster !
       run: kubectl get pods -A
+      
     - name: Build image
+      shell: powershell
       run: |
-          docker build -f ../webapp/Dockerfile -t nginx:latest .
+        cd webapp
+        docker build -f ./Dockerfile -t nginx:latest .
 
     - name: Deploy to Kubernetes
       run: |
