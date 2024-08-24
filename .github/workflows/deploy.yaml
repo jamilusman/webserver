@@ -47,7 +47,7 @@ jobs:
       run: kubectl get pods -A
     - name: Build image
       run: |
-          docker build -f ./Dockerfile -t nginx:latest .
+          docker build -f ../webapp/Dockerfile -t nginx:latest .
 
     - name: Deploy to Kubernetes
       run: |
