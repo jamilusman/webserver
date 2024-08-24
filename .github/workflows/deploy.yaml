@@ -54,10 +54,6 @@ jobs:
     - name: Build image
       run: |
         docker build -f ./Dockerfile -t nginx:latest .
-    
-    - name: Deploy to Kubernetes
-      run: |
-        kubectl
 
     - name: Deploy to Kubernetes
       run: |
