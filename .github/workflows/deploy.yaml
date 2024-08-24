@@ -23,6 +23,11 @@ jobs:
       with:
         repository: jamilusman/webserver
 
+    - name: Set Execution Policy
+      shell: powershell
+      run: |
+        Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+
     - name: Install Docker
       shell: powershell
       run: |
