@@ -46,31 +46,35 @@ jobs:
     - name: Start minikube
       uses: medyagh/setup-minikube@latest
 
-    - name: Print all directories
+    - name: Create Kubernetes namespaces
       run: |
-        echo "Printing all directories:"
-        ls -R
+        kubectl create namespace qa || true
+        kubectl create namespace prd || true
 
     - name: Build image
       run: |
         docker build -f ./Dockerfile -t nginx:latest .
+    
+    - name: Deploy to Kubernetes
+      run: |
+        kubectl
 
     - name: Deploy to Kubernetes
       run: |
-        helm upgrade webapp-release-qa ./ --values ./values.yaml -f ./values-qa.yaml -n qa
+        helm install webapp-release-qa ./ --values ./values.yaml -f ./values-qa.yaml -n qa
+        helm install webapp-release-prd ./ --values ./values.yaml -f ./values-prd.yaml -n prd
 
         # Use Helm to deploy with the appropriate values file
         # helm upgrade --install my-release ./charts \
         #   --namespace ${{ github.event.inputs.environment }} \
         #   --values values-${{ github.event.inputs.environment }}.yaml
 
-    - name: Apply Kubernetes manifests
-      run: |
-        kubectl apply -f templates/configmap.yaml
-        kubectl apply -f templates/deployment.yaml
-        kubectl apply -f templates/service.yaml
-
-    # - name: Verify deployment
+    # - name: Apply Kubernetes manifests
     #   run: |
-    #     kubectl rollout status deployment/nginx-deployment
-    #     kubectl get pods
+    #     kubectl apply -f templates/configmap.yaml
+    #     kubectl apply -f templates/deployment.yaml
+    #     kubectl apply -f templates/service.yaml
+
+    - name: Verify deployment
+      run: |
+        kubectl --namespace qa port-forward service/nginxapp 8888:80
