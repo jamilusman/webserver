@@ -46,6 +46,11 @@ jobs:
     - name: Start minikube
       uses: medyagh/setup-minikube@latest
 
+    - name: Print all directories
+      run: |
+        echo "Printing all directories:"
+        ls -R
+
     - name: Build image
       shell: powershell
       run: |
