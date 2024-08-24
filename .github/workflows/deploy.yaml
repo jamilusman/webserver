@@ -47,11 +47,7 @@ jobs:
       run: kubectl get pods -A
     - name: Build image
       run: |
-          export SHELL=/bin/bash
-          eval $(minikube -p minikube docker-env)
-          docker build -f ./Dockerfile -t jamilusman/nginx:latest .
-          echo -n "verifying images:"
-          docker images
+          docker build -f ./Dockerfile -t nginx:latest .
 
     - name: Deploy to Kubernetes
       run: |
