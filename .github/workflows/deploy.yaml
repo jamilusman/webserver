@@ -46,7 +46,6 @@ jobs:
     - name: Build image
       shell: powershell
       run: |
-        cd webapp
         docker build -f ./Dockerfile -t nginx:latest .
 
     - name: Deploy to Kubernetes
