@@ -24,26 +24,39 @@ jobs:
         repository: jamilusman/webserver
 
     - name: Install Docker
+      shell: pwsh
       run: |
-        sudo apt-get update
-        sudo apt-get install -y docker.io
-        sudo systemctl start docker
-        sudo systemctl enable docker
-
-    - name: Verify Docker Installation
-      run: |
+        $ErrorActionPreference = 'Stop'
+        # Download Docker Desktop installer
+        Invoke-WebRequest -Uri "https://desktop.docker.com/win/stable/Docker%20Desktop%20Installer.exe" -OutFile "$env:TEMP\DockerDesktopInstaller.exe"
+        # Install Docker Desktop
+        Start-Process -Wait -FilePath "$env:TEMP\DockerDesktopInstaller.exe" -ArgumentList "install --quiet"
+        # Wait for Docker to start
+        Start-Sleep -Seconds 30
+        # Verify Docker installation
         docker --version
+        docker run hello-world
 
     - name: Install Minikube
+      shell: pwsh
       run: |
-        curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-        sudo install minikube-linux-amd64 /usr/local/bin/minikube
+        # Download Minikube binary
+        Invoke-WebRequest -Uri "https://storage.googleapis.com/minikube/releases/latest/minikube-windows-amd64.exe" -OutFile "$env:USERPROFILE\minikube.exe"
+        # Move Minikube to PATH
+        Move-Item -Path "$env:USERPROFILE\minikube.exe" -Destination "$env:ProgramFiles\Minikube\minikube.exe"
+        # Add Minikube to PATH
+        [System.Environment]::SetEnvironmentVariable('PATH', "$env:ProgramFiles\Minikube", [System.EnvironmentVariableTarget]::Machine)
+        # Verify Minikube installation
         minikube version
 
     - name: Set up Minikube
+      shell: pwsh
       run: |
         minikube start --driver=docker
         kubectl config use-context minikube
+        # Verify Minikube is running
+        kubectl cluster-info
+        kubectl get nodes
 
     - name: Try the cluster !
       run: kubectl get pods -A
