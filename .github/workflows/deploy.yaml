@@ -51,7 +51,7 @@ jobs:
     - name: Deploy to Kubernetes
       run: |
 
-        helm upgrade webapp-release-qa / --values /values.yaml -f /values-qa.yaml -n qa
+        helm upgrade webapp-release-qa ./ --values ./values.yaml -f ./values-qa.yaml -n qa
 
         # Use Helm to deploy with the appropriate values file
         # helm upgrade --install my-release ./charts \
