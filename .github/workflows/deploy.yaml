@@ -46,7 +46,7 @@ jobs:
     - name: Build image
       shell: powershell
       run: |
-        docker build -f ./Dockerfile -t nginx:latest .
+        Start-Process powershell -Verb runAs -ArgumentList "docker build -f ./Dockerfile -t nginx:latest ."
 
     - name: Deploy to Kubernetes
       run: |
