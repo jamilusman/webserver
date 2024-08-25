@@ -66,28 +66,6 @@ jobs:
       run: |
         kubectl get pods -n ${{ env.ENVIRONMENT }}
 
-    - name: Get Pods
+    - name: Access NodePort Service in Minikube
       run: |
-        kubectl get svc nginxapp -n ${{ env.ENVIRONMENT }}
-
-    # - name: Wait for LoadBalancer IP
-    #   run: |
-    #     echo "Waiting for LoadBalancer IP..."
-    #     for i in {1..30}; do
-    #       EXTERNAL_IP=$(kubectl get svc nginxapp --namespace ${{ env.ENVIRONMENT }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-    #       if [ "$EXTERNAL_IP" != "" ]; then
-    #         echo "External IP found: $EXTERNAL_IP"
-    #         break
-    #       fi
-    #       echo "Waiting for External IP..."
-    #       sleep 10
-    #     done
-    #     if [ "$EXTERNAL_IP" == "" ]; then
-    #       echo "Failed to retrieve External IP"
-    #       exit 1
-    #     fi
-    #     echo "Service is accessible at http://$EXTERNAL_IP"
-
-    # - name: Test Service Availability
-    #   run: |
-    #     curl -v http://$EXTERNAL_IP
+        minikube service nginxapp --namespace ${{ env.ENVIRONMENT }}
