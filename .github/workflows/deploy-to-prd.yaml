@@ -1,19 +1,19 @@
-name: Deploy to Production
+# name: Deploy to Production
 
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Environment to deploy to'
-        required: true
-        default: 'main'
+# on:
+#   push:
+#     branches:
+#       - main
+#   workflow_dispatch:
+#     inputs:
+#       environment:
+#         description: 'Environment to deploy to'
+#         required: true
+#         default: 'main'
 
-jobs:
-  deploy:
-    uses: ./.github/workflows/deployment-template.yaml
-    with:
-      environment: prd
-      values_file: values-prd.yaml
+# jobs:
+#   deploy:
+#     uses: workflows/deployment-template.yaml
+#     with:
+#       environment: prd
+#       values_file: values-prd.yaml
