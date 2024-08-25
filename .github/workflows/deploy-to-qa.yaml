@@ -1,24 +1,14 @@
 name: Deploy to QA
 
-# on:
-#   workflow_dispatch:
-#     inputs:
-#       environment:
-#         description: 'Environment to deploy to'
-#         required: true
-#         default: 'qa'
-#         type: choice
-#         options:
-#           - qa
-
 on:
   push:
     branches:
       - qa
+  workflow_dispatch:
 
 jobs:
   deploy:
-    uses: "./.github/workflows/deployment-template.yaml"
+    uses: ./.github/workflows/deployment-template.yaml
     with:
       environment: qa
       values_file: values-qa.yaml
