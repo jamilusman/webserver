@@ -5,7 +5,17 @@ on:
     branches:
       - main
       - qa
-      - prd
+  
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'qa'
+        type: choice
+        options:
+          - qa
+          - main
 
 jobs:
   build_and_deploy:
