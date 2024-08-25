@@ -66,6 +66,30 @@ jobs:
       run: |
         kubectl get pods -n ${{ env.ENVIRONMENT }}
 
-    - name: Access NodePort Service in Minikube
+    # - name: Access NodePort Service in Minikube
+    #   run: |
+    #     minikube service nginxapp --namespace ${{ env.ENVIRONMENT }}
+
+    - name: Access Service via NodePort
       run: |
-        minikube service nginxapp --namespace ${{ env.ENVIRONMENT }}
+        echo "Fetching NodePort information..."
+        NODE_PORT=$(kubectl get svc nginxapp --namespace ${{ env.ENVIRONMENT }} -o jsonpath='{.spec.ports[0].nodePort}')
+        echo "NodePort: $NODE_PORT"
+
+        echo "Fetching Minikube IP..."
+        MINIKUBE_IP=$(minikube ip)
+
+        echo "Trying to access the service..."
+        curl -v http://$MINIKUBE_IP:$NODE_PORT || echo "Failed to access service on $MINIKUBE_IP:$NODE_PORT"
+
+    - name: Check Service Availability
+      run: |
+        echo "Checking service availability at http://$MINIKUBE_IP:$NODE_PORT"
+        curl -s -o /dev/null -w "%{http_code}" http://$MINIKUBE_IP:$NODE_PORT
+        if [ $? -ne 0 ]; then
+          echo "Service is not reachable."
+          exit 1
+        else
+          echo "Service is reachable."
+        fi
+
