@@ -8,7 +8,7 @@ on:
 
 jobs:
   deploy:
-    uses: ./.github/workflows/templates/deployment-template.yaml
+    uses: ./.github/workflows/deployment-template.yaml
     with:
       environment: prd
       values_file: values-prd.yaml
