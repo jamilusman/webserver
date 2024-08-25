@@ -66,10 +66,6 @@ jobs:
       run: |
         kubectl get pods -n ${{ env.ENVIRONMENT }}
 
-    # - name: Access NodePort Service in Minikube
-    #   run: |
-    #     minikube service nginxapp --namespace ${{ env.ENVIRONMENT }}
-
     - name: Access Service via NodePort
       run: |
         echo "Fetching NodePort information..."
