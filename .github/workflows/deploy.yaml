@@ -1,21 +1,18 @@
 name: Deploy to Kubernetes
 
 on:
-  workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Environment to deploy to'
-        required: true
-        default: 'qa'
-        type: choice
-        options:
-          - qa
-          - prd
+  push:
+    branches:
+      - main
+      - qa
+      - prd
 
 jobs:
   build_and_deploy:
-    runs-on: 
-      - ubuntu-latest
+    runs-on: ubuntu-latest
+
+    env:
+      ENVIRONMENT: ${{ github.ref_name }}
 
     steps:
     - name: Checkout code
@@ -31,7 +28,6 @@ jobs:
         sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
         sudo chmod a+r /etc/apt/keyrings/docker.asc
 
-        # Add the repository to Apt sources:
         echo \
           "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
           $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
@@ -39,17 +35,12 @@ jobs:
         sudo apt-get update
         sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-    - name: Verify Docker Installation
-      run: |
-        docker --version
-
     - name: Start minikube
       uses: medyagh/setup-minikube@latest
 
-    - name: Create Kubernetes namespaces
+    - name: Create Kubernetes namespace
       run: |
-        kubectl create namespace qa || true
-        kubectl create namespace prd || true
+        kubectl create namespace ${{ env.ENVIRONMENT }} || true
 
     - name: Build image
       run: |
@@ -57,30 +48,45 @@ jobs:
 
     - name: Deploy to Kubernetes
       run: |
-        helm install webapp-release-qa ./ --values ./values.yaml -f ./values-qa.yaml -n qa
-        helm install webapp-release-prd ./ --values ./values.yaml -f ./values-prd.yaml -n prd
-
-        # Use Helm to deploy with the appropriate values file
-        # helm upgrade --install my-release ./charts \
-        #   --namespace ${{ github.event.inputs.environment }} \
-        #   --values values-${{ github.event.inputs.environment }}.yaml
-
-    # - name: Apply Kubernetes manifests
-    #   run: |
-    #     kubectl apply -f templates/configmap.yaml
-    #     kubectl apply -f templates/deployment.yaml
-    #     kubectl apply -f templates/service.yaml
-
-    - name: Test service URLs
-      run: |
-        kubectl get pods -A
-        kubectl get svc -A
+        helm upgrade --install webapp-release-${{ env.ENVIRONMENT }} ./ \
+        --values ./values.yaml -f ./values-${{ env.ENVIRONMENT }}.yaml \
+        -n ${{ env.ENVIRONMENT }}
 
     - name: Wait for Pods to be Ready
       run: |
-        kubectl wait --for=condition=available --timeout=300s deployment/nginxapp --namespace qa
-        kubectl wait --for=condition=ready --timeout=300s pod -l app=nginxapp --namespace qa
-        
-    - name: Verify deployment
+        kubectl wait --for=condition=available --timeout=300s deployment/nginxapp --namespace ${{ env.ENVIRONMENT }}
+        kubectl wait --for=condition=ready --timeout=300s pod -l app=nginxapp --namespace ${{ env.ENVIRONMENT }}
+
+    - name: Get Pods
       run: |
-        kubectl --namespace qa port-forward service/nginxapp 8888:80
+        kubectl get pods -n ${{ env.ENVIRONMENT }}
+
+    - name: Wait for LoadBalancer IP
+      run: |
+        echo "Waiting for LoadBalancer IP..."
+        for i in {1..30}; do
+          EXTERNAL_IP=$(kubectl get svc nginxapp --namespace qa -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+          if [ "$EXTERNAL_IP" != "" ]; then
+            echo "External IP found: $EXTERNAL_IP"
+            break
+          fi
+          echo "Waiting for External IP..."
+          sleep 10
+        done
+        if [ "$EXTERNAL_IP" == "" ]; then
+          echo "Failed to retrieve External IP"
+          exit 1
+        fi
+        echo "Service is accessible at http://$EXTERNAL_IP"
+
+    - name: Test Service Availability
+      run: |
+        curl -v http://$EXTERNAL_IP
+    
+    # - name: Get services
+    #   run: |
+    #     kubectl get svc -n ${{ env.ENVIRONMENT }}
+        
+    # - name: Verify deployment
+    #   run: |
+    #     kubectl --namespace ${{ env.ENVIRONMENT }} port-forward service/nginxapp 8888:80
