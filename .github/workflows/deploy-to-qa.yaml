@@ -24,7 +24,7 @@ on:
 
 jobs:
   deploy:
-    uses: ./.github/workflows/deployment-template.yaml
+    uses: "./.github/workflows/deployment-template.yaml"
     with:
       environment: qa
       values_file: values-qa.yaml
