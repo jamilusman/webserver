@@ -1,0 +1,14 @@
+name: Deploy to QA
+
+on:
+  push:
+    branches:
+      - qa
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/templates/deployment-template.yaml
+    with:
+      environment: qa
+      values_file: values-qa.yaml
