@@ -1,10 +1,21 @@
 name: Deploy to QA
 
 on:
-  push:
-    branches:
-      - qa
   workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'qa'
+        type: choice
+        options:
+          - qa
+
+# on:
+#   # push:
+#   #   branches:
+#   #     - qa
+#   workflow_dispatch:
     # inputs:
     #   environment:
     #     description: 'Environment to deploy to'
