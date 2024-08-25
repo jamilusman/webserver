@@ -1,4 +1,4 @@
-name: Deploy to Kubernetes
+name: Deploy to Minikube Cluster
 
 on:
   workflow_dispatch:
