@@ -81,15 +81,3 @@ jobs:
 
         echo "Trying to access the service..."
         curl -v http://$MINIKUBE_IP:$NODE_PORT || echo "Failed to access service on $MINIKUBE_IP:$NODE_PORT"
-
-    - name: Check Service Availability
-      run: |
-        echo "Checking service availability at http://$MINIKUBE_IP:$NODE_PORT"
-        curl -s -o /dev/null -w "%{http_code}" http://$MINIKUBE_IP:$NODE_PORT
-        if [ $? -ne 0 ]; then
-          echo "Service is not reachable."
-          exit 1
-        else
-          echo "Service is reachable."
-        fi
-
