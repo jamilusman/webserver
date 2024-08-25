@@ -1,23 +1,23 @@
 name: Deploy to Kubernetes
 
 on:
-  workflow_call:
+  workflow_dispatch:
     inputs:
       environment:
-        description: 'Environment to deploy to'
+        description: 'Select the environment to deploy to'
         required: true
-        type: string
-      values_file:
-        description: 'Values file for Helm'
-        required: true
-        type: string
+        default: 'qa'
+        type: choice
+        options:
+          - qa
+          - prd
 
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
 
     env:
-      ENVIRONMENT: ${{ inputs.environment }}
+      ENVIRONMENT: ${{ github.event.inputs.environment }}
 
     steps:
     - name: Checkout code
@@ -54,7 +54,7 @@ jobs:
     - name: Deploy to Kubernetes
       run: |
         helm upgrade --install webapp-release-${{ env.ENVIRONMENT }} ./ \
-        --values ./values.yaml -f ./${{ inputs.values_file }} \
+        --values ./values.yaml -f ./values-${{ env.ENVIRONMENT }}.yaml \
         -n ${{ env.ENVIRONMENT }}
 
     - name: Wait for Pods to be Ready
