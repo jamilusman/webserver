@@ -1,0 +1,79 @@
+name: Deploy to Minikube Cluster
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Select the environment to deploy to'
+        required: true
+        default: 'qa'
+        type: choice
+        options:
+          - qa
+          - prd
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      ENVIRONMENT: ${{ github.event.inputs.environment }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        repository: jamilusman/webserver
+
+    - name: Install Docker
+      run: |
+        sudo apt-get update
+        sudo apt-get install ca-certificates curl
+        sudo install -m 0755 -d /etc/apt/keyrings
+        sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+        sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+        echo \
+          "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+          $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+          sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+        sudo apt-get update
+        sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+    - name: Start minikube
+      uses: medyagh/setup-minikube@latest
+
+    - name: Create Kubernetes namespace
+      run: |
+        kubectl create namespace ${{ env.ENVIRONMENT }} || true
+
+    - name: Build image
+      run: |
+        docker build -f ./Dockerfile -t nginx:latest .
+
+    - name: Deploy to Kubernetes
+      run: |
+        helm upgrade --install webapp-release-${{ env.ENVIRONMENT }} ./ \
+        --values ./values.yaml -f ./values-${{ env.ENVIRONMENT }}.yaml \
+        -n ${{ env.ENVIRONMENT }}
+
+    - name: Wait for Pods to be Ready
+      run: |
+        kubectl wait --for=condition=available --timeout=300s deployment/nginxapp --namespace ${{ env.ENVIRONMENT }}
+        kubectl wait --for=condition=ready --timeout=300s pod -l app=nginxapp --namespace ${{ env.ENVIRONMENT }}
+
+    - name: Get Pods
+      run: |
+        kubectl get pods -n ${{ env.ENVIRONMENT }}
+
+    - name: Access Service via NodePort
+      run: |
+        echo "Fetching NodePort information..."
+        NODE_PORT=$(kubectl get svc nginxapp --namespace ${{ env.ENVIRONMENT }} -o jsonpath='{.spec.ports[0].nodePort}')
+        echo "NodePort: $NODE_PORT"
+
+        echo "Fetching Minikube IP..."
+        MINIKUBE_IP=$(minikube ip)
+
+        echo "Trying to access the service..."
+        curl -v http://$MINIKUBE_IP:$NODE_PORT || echo "Failed to access service on $MINIKUBE_IP:$NODE_PORT"
